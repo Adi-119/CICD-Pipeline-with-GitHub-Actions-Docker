@@ -64,7 +64,7 @@ pipeline {
 
     stage('Push to Docker Hub') {
       steps {
-        withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CRED}", usernameVariable: 'adi119', passwordVariable: 'dckr_pat_Rg1kRNeStXJbWplrrRuZUHd8RR8')]) {
+        withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CRED}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
           script {
             // set DOCKERHUB_USER for IMAGE_NAME
             env.DOCKERHUB_USER = DH_USER
