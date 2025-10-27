@@ -1,0 +1,246 @@
+Started by user Aditya Sabne 
+Obtained Jenkinsfile from git https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/jenkins-ci-cd-sample
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+using credential dockerhub-creds
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/jenkins-ci-cd-sample/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git # timeout=10
+Fetching upstream changes from https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.0'
+using GIT_ASKPASS to set credentials Docker Hub credentials
+ > git fetch --tags --force --progress -- https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 38d770f7d0a884ee8f75f004cd7e7e7fd78efc3b (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 38d770f7d0a884ee8f75f004cd7e7e7fd78efc3b # timeout=10
+Commit message: "platy"
+ > git rev-list --no-walk 8bded7f4f056cde85f393b821292adf0d23e6965 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Prepare)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+using credential dockerhub-creds
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/jenkins-ci-cd-sample/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git # timeout=10
+Fetching upstream changes from https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.43.0'
+using GIT_ASKPASS to set credentials Docker Hub credentials
+ > git fetch --tags --force --progress -- https://github.com/Adi-119/CICD-Pipeline-with-GitHub-Actions-Docker.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 38d770f7d0a884ee8f75f004cd7e7e7fd78efc3b (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 38d770f7d0a884ee8f75f004cd7e7e7fd78efc3b # timeout=10
+Commit message: "platy"
+[Pipeline] withCredentials
+Masking supported pattern matches of $DH_PASS
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ git rev-parse --short HEAD
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install dependencies)
+[Pipeline] sh
++ npm ci
+
+added 69 packages, and audited 70 packages in 957ms
+
+14 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Start app for tests)
+[Pipeline] sh
++ nohup node index.js
++ seq 1 15
++ nc -z localhost 3000
++ sleep 1
++ nc -z localhost 3000
+Connection to localhost (127.0.0.1) 3000 port [tcp/*] succeeded!
++ echo app up
+app up
++ break
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run tests)
+[Pipeline] sh
++ npm test
+
+> jenkins-ci-cd-sample@1.0.0 test
+> node test.js
+
+OK
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker image)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] echo
+Building image adi119/jenkins-ci-cd-sample:38d770f
+[Pipeline] sh
++ docker build -t adi119/jenkins-ci-cd-sample:38d770f .
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 288B done
+#1 DONE 0.0s
+
+#2 [auth] library/node:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:18-alpine
+#3 DONE 1.2s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 94B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/node:18-alpine@sha256:8d6421d663b4c28fd3ebc498332f249011d118945588d0a35cb9bc4b8ca09d9e
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 2.91kB done
+#6 DONE 0.0s
+
+#7 [2/5] WORKDIR /app
+#7 CACHED
+
+#8 [3/5] COPY package.json ./
+#8 CACHED
+
+#9 [4/5] RUN npm install --production
+#9 CACHED
+
+#10 [5/5] COPY . .
+#10 DONE 0.1s
+
+#11 exporting to image
+#11 exporting layers 0.0s done
+#11 writing image sha256:930f607f164330f35b04876bdebb56428238612b68f549d3fdded00302659405 done
+#11 naming to docker.io/adi119/jenkins-ci-cd-sample:38d770f done
+#11 DONE 0.1s
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push to Docker Hub)
+[Pipeline] withCredentials
+Masking supported pattern matches of $DH_PASS
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ echo+ docker login -u adi119 --password-stdin
+ ****
+Login Succeeded
++ docker tag adi119/jenkins-ci-cd-sample:38d770f adi119/jenkins-ci-cd-sample:latest
++ docker push adi119/jenkins-ci-cd-sample:38d770f
+The push refers to repository [docker.io/adi119/jenkins-ci-cd-sample]
+2477263b8d2b: Preparing
+00b8b83aa9a4: Preparing
+3bbf72d2ed93: Preparing
+06b4b4438af0: Preparing
+82140d9a70a7: Preparing
+f3b40b0cdb1c: Preparing
+0b1f26057bd0: Preparing
+08000c18d16d: Preparing
+f3b40b0cdb1c: Waiting
+0b1f26057bd0: Waiting
+08000c18d16d: Waiting
+82140d9a70a7: Mounted from library/node
+2477263b8d2b: Pushed
+3bbf72d2ed93: Pushed
+06b4b4438af0: Pushed
+f3b40b0cdb1c: Mounted from library/node
+00b8b83aa9a4: Pushed
+0b1f26057bd0: Mounted from library/node
+08000c18d16d: Mounted from library/node
+38d770f: digest: sha256:f29e2b2fb5b5070aa344acd0406a1ce68ad5ad3b1a55e10ce41aa5d7444bb201 size: 1991
++ docker push adi119/jenkins-ci-cd-sample:latest
+The push refers to repository [docker.io/adi119/jenkins-ci-cd-sample]
+2477263b8d2b: Preparing
+00b8b83aa9a4: Preparing
+3bbf72d2ed93: Preparing
+06b4b4438af0: Preparing
+82140d9a70a7: Preparing
+f3b40b0cdb1c: Preparing
+0b1f26057bd0: Preparing
+08000c18d16d: Preparing
+f3b40b0cdb1c: Waiting
+0b1f26057bd0: Waiting
+08000c18d16d: Waiting
+2477263b8d2b: Layer already exists
+3bbf72d2ed93: Layer already exists
+82140d9a70a7: Layer already exists
+00b8b83aa9a4: Layer already exists
+06b4b4438af0: Layer already exists
+08000c18d16d: Layer already exists
+0b1f26057bd0: Layer already exists
+f3b40b0cdb1c: Layer already exists
+latest: digest: sha256:f29e2b2fb5b5070aa344acd0406a1ce68ad5ad3b1a55e10ce41aa5d7444bb201 size: 1991
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to Minikube)
+Stage "Deploy to Minikube" skipped due to when conditional
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] sh
++ echo ---- jenkins-app.log ----
+---- jenkins-app.log ----
++ tail -n +1 jenkins-app.log
+Listening on 3000
+[Pipeline] sh
++ docker ps -a
+CONTAINER ID   IMAGE                        COMMAND                  CREATED       STATUS                     PORTS     NAMES
+cdfa37d1cc0e   jenkins-ci-cd-sample:local   "docker-entrypoint.s…"   6 hours ago   Exited (137) 6 hours ago             cicd-pipeline-with-github-actions-docker-web-1
+d0a9d8fe05f2   hello-world                  "/hello"                 6 hours ago   Exited (0) 6 hours ago               amazing_hugle
+[Pipeline] echo
+✅ Pipeline completed successfully.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
