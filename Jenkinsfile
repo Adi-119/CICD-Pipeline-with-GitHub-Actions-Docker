@@ -11,16 +11,18 @@ pipeline {
 
   stages {
     stage('Prepare') {
-      steps {
-        checkout scm
-        script {
-          // determine tag (use git commit short)
-          IMAGE_TAG = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-          env.IMAGE_TAG = IMAGE_TAG
-          env.IMAGE_NAME = "${DOCKERHUB_USER ?: 'REPLACE_WITH_USER'}/jenkins-ci-cd-sample:${IMAGE_TAG}"
-        }
+  steps {
+    checkout scm
+    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+      script {
+        def imageTag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+        env.IMAGE_TAG = imageTag
+        env.DOCKERHUB_USER = DH_USER
+        env.IMAGE_NAME = "${DH_USER}/jenkins-ci-cd-sample:${IMAGE_TAG}"
       }
     }
+  }
+}
 
     stage('Install dependencies') {
       steps {
@@ -57,18 +59,19 @@ pipeline {
         script {
           // get username from credentials (we'll use withCredentials to login later)
           echo "Building image ${env.IMAGE_NAME}"
-          sh "docker build -t ${DOCKERHUB_USER}/jenkins-ci-cd-sample:${IMAGE_TAG} ."
+          sh "docker build -t ${env.IMAGE_NAME} ."
         }
       }
     }
 
     stage('Push to Docker Hub') {
       steps {
-        withCredentials([usernamePassword(credentialsId: "${DOCKERHUB_CRED}", usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-          script {
+       withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+      script {
             // set DOCKERHUB_USER for IMAGE_NAME
             env.DOCKERHUB_USER = DH_USER
-            env.IMAGE_NAME = "${DH_USER}/jenkins-ci-cd-sample:${IMAGE_TAG}"
+            env.IMAGE_NAME = "${DH_USER}/jenkins-ci-cd-sample:${env.IMAGE_TAG}"
+
 
             sh '''
               echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
