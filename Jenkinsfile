@@ -10,15 +10,14 @@ pipeline {
   }
 
   stages {
-    stage('Prepare') {
+   stage('Prepare') {
   steps {
     checkout scm
     withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
       script {
-        def imageTag = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-        env.IMAGE_TAG = imageTag
+        env.IMAGE_TAG = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
         env.DOCKERHUB_USER = DH_USER
-        env.IMAGE_NAME = "${DH_USER}/jenkins-ci-cd-sample:${IMAGE_TAG}"
+        env.IMAGE_NAME = "${env.DOCKERHUB_USER}/jenkins-ci-cd-sample:${env.IMAGE_TAG}"
       }
     }
   }
@@ -75,9 +74,9 @@ pipeline {
 
             sh '''
               echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-              docker tag ${DH_USER}/jenkins-ci-cd-sample:${IMAGE_TAG} ${DH_USER}/jenkins-ci-cd-sample:latest
-              docker push ${DH_USER}/jenkins-ci-cd-sample:${IMAGE_TAG}
-              docker push ${DH_USER}/jenkins-ci-cd-sample:latest
+              docker tag ${env.IMAGE_NAME} ${env.DOCKERHUB_USER}/jenkins-ci-cd-sample:latest
+docker push ${env.IMAGE_NAME}
+docker push ${env.DOCKERHUB_USER}/jenkins-ci-cd-sample:latest
             '''
           }
         }
