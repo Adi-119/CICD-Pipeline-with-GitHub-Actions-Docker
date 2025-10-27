@@ -3,7 +3,8 @@ pipeline {
 
   environment {
     DOCKERHUB_CRED = 'dockerhub-creds'  // Jenkins credential ID
-    DOCKERHUB_USER = ''                 // will be populated from credentials
+    DOCKERHUB_USER = credentials('dockerhub-creds')
+                 // will be populated from credentials
     IMAGE_NAME = ''                      // will be constructed
     IMAGE_TAG = ''                       // git commit sha or build number
   }
